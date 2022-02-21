@@ -11,5 +11,5 @@ you can open your terminal, then enter:
           
 where MyModuleName is a module I made.
 
-I've made strfilter.py till now. Don't worry, there will be more
-Python projects when told.
+I've made strfilter.py and boxmaker.py till now. Don't worry, there will be more
+Python projects when uploaded.
