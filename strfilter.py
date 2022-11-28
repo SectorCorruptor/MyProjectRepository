@@ -6,7 +6,7 @@
 # UPDATES:
 #
 # V2: self.findclosest() is now self.findclosest(place)
-#
+# V2.1: Updated caseless matching algorithm
 
 """
 This modules filters words from a list based on an input.
@@ -70,7 +70,7 @@ class TextFilter:
                 l = 0
                 self.this = []
                 while not l == len(this):
-                    self.this.append(this[l].lower()) # an easy convention is to lowercase all the letters
+                    self.this.append(this[l].casefold()) # casefolding
                     l = l + 1
                 self.recinput = recinput.lower() # and of the recinput, so case-sentivity won't affect the results here
             self.inclist = []
