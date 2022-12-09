@@ -1,7 +1,7 @@
 # This module originates from scratch.mit.edu user rizwan4j
 # 141 lined program.
 # Email: mohammed.r210@outlook.com
-# textfilter.py v2.0
+# textfilter.py v2.1
 # 
 # UPDATES:
 #
