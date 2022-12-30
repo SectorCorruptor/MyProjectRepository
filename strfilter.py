@@ -7,6 +7,7 @@
 #
 # V2: self.findclosest() is now self.findclosest(place)
 # V2.1: Updated caseless matching algorithm
+# V2.2: Something smells fishy about __all__
 
 """
 This modules filters words from a list based on an input.
@@ -25,7 +26,7 @@ functions, and 3 variables. There are only 2 things to do:
 
 from sys import version as _vers
 
-__all__ = ["TextFilter", "findclosest", "NotCaseSensitiveError"]
+__all__ = ["TextFilter", "NotCaseSensitiveError"]
 
 def obtaintill(string, char):
     """
