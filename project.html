@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <!-- Title = Calculator-->
+        <title>Calculator</title>
+        <!--Note that all comments after the 
+        <style> tag and before the
+        </style> tag will be in the format /* ... */-->
+        <style>
+        /* The .stuff are used to make things whose class
+        is "stuff" to have the same CSS styleset. It's a 
+        little like having <... style="this:that;that:this;">
+        in every element that is expected to share the same 
+        characteristics, except with lesser characters. */
+        body {
+            background-color:black;
+        }
+        /* Click */
+        button {
+            border-style: outset;
+        }
+        button:active {
+            border-style: inset;
+        }
+        .calculator_body {
+            /* Sets background color to a greyish color */
+            background-color:#505050;
+            /* Sets border radius to 15 pixels, curving it */
+            border-radius:15px;
+            /* Sets height to 500 pixels */
+            height:590px;
+            /* Sets width to 410 pixels */
+            width:410px;
+            /* Automatically aligns the calculator's
+            body to the middle of the screen */
+            margin:auto;
+            position:relative;
+            bottom:65px;
+        }
+        .calculator_screen {
+            /* Sets background color blackish */
+            background-color:#1c1c1c;
+            border-radius:15px;
+            width:401px;
+            margin-right:auto;
+            margin-left:auto;
+            height:100px;
+            /* The next 2 lines allow us to position
+            the calculator screen at the top */
+            position:relative;
+            top:5px;
+            /* Inside text color will be white, aligned
+            to the right, with font size being 75 pixels
+            and font family being verdana */
+            color:white;
+            text-align:right;
+            font-size:75px;
+            font-family:'Verdana';
+        }
+        .button {
+            /* A greyish color */
+            background-color:#a6a6a6;
+            border-radius:15px;
+            width:96px;
+            /* Align to middle */
+            margin-right:auto;
+            margin-left:auto;
+            height:96px;
+            /* Font-size: 75 pixels */
+            font-size:75px;
+            /* Border color = background color */
+            border-color:#a6a6a6;
+            /* For placement purposes */
+            position:relative;
+            top:7px;
+            left:7px;
+        }
+        /* During a mouse hover on a button, change
+        color */
+        .button:hover {
+            background-color:aqua;
+            /* After 250 milliseconds, change color... */
+            transition-duration:250ms;
+            /* ...immediately. */
+            transition-delay:0ms;
+            border-color:aqua;
+        }
+        /* Tweaks for number buttons and operating buttons */
+        .specialbutton {
+            background-color:palevioletred;
+            border-color:palevioletred;
+        }
+        .numbutton {
+            background-color:yellow;
+            border-color:yellow;
+        }
+        #warning {
+            /* Font color = white */
+            color:white;
+            /* Font family = Lucida Console */
+            font-family:'Lucida Console';
+            /* Center align */
+            text-align:center;
+        }
+        </style>
+    </head>
+    <body>
+        <!-- divs do nothing but act as a useless container
+        without CSS -->
+        <div class="calculator_body">
+            <div class="calculator_screen">
+                <!--The text which is shown
+                on screen-->
+                <p id="screentext"></p>
+            </div>
+            <!-- buttons. The class thing allows us to 
+            specify that "this element will follow these 
+            characteristics along with the other elements." -->
+            <!--Multiple classes can be specified, by seperating the classnames
+            by spaces-->
+            <button class="button numbutton" onclick="appendnum('1')">1</button>
+            <button class="button numbutton" onclick="appendnum('2')">2</button>
+            <button class="button numbutton" onclick="appendnum('3')">3</button>
+            <button class="button" onclick="setop('+')">+</button>
+            <br>
+            <button class="button numbutton" onclick="appendnum('4')">4</button>
+            <button class="button numbutton" onclick="appendnum('5')">5</button>
+            <button class="button numbutton" onclick="appendnum('6')">6</button>
+            <button class="button" onclick="setop('-')">-</button>
+            <br>
+            <button class="button numbutton" onclick="appendnum('7')">7</button>
+            <button class="button numbutton" onclick="appendnum('8')">8</button>
+            <button class="button numbutton" onclick="appendnum('9')">9</button>
+            <button class="button" onclick="setop('*')">&times;</button>
+            <br>
+            <button class="button specialbutton" onclick="dispresult()">=</button>
+            <button class="button numbutton" onclick="appendnum('0')">0</button>
+            <button class="button specialbutton" onclick="delnum()">&larr;</button>
+            <button class="button" onclick="setop('/')">&divide;</button>
+            <br>
+            <button class="button specialbutton" onclick="removeall()">C</button>
+            <button class="button specialbutton" onclick="switchcase()">±</button>
+            <button class="button specialbutton" onclick="adddec()">.</button>
+            <button class="button" onclick="setop('%')">%</button>
+        </div>
+        <!-- A warning -->
+        <p id="warning">Note: if you try to land on the moon using this calculator, you probably
+            deserve the end result.</p>
+        <!-- javascript -->
+        <script>
+            // Operator
+            var operator = "";
+            // First number
+            var firstnum = "";
+            // Second number
+            var secondnum = "";
+            // Which number the user is editing
+            var editing = "firstnum";
+            // Function to add a digit to the number
+            // user is editing
+            function setto(number){
+                // Set color of screen text to white
+                document.getElementById('screentext').style.color = 'white'
+                // Set content to number
+                document.getElementById('screentext').innerHTML = number
+                // If it is an error or exceeds screen...
+                if(number == "Error"||number == "Can't Fit"){
+                    // ...set font color to red, and add a space
+                    document.getElementById('screentext').style.color = 'red'
+                    document.getElementById('screentext').innerHTML += "&nbsp;"
+                }
+            }
+            function appendnum(num){
+                // If we're editing the first number
+                if(editing == "firstnum"){
+                    // and if the first number is 9 or less
+                    // digits (9 or more won't fit)
+                    if(firstnum.length < 8){
+                        // then if firstnum is zero and 
+                        // if we are not concatenating a decimal
+                        // point
+                        if(firstnum == "0" && num != "."){
+                            // if we are not concatenating another 0
+                            if(num != "0"){
+                                firstnum = num;
+                                // set screen to firstnum
+                                setto(firstnum)
+                            }
+                        }
+                        else{
+                            // concatenate the digit
+                            firstnum += num;
+                            // Get the element with id=screentext, and set its content
+                            // to firstnum
+                            setto(firstnum)
+                        }
+                    }
+                }
+                // else if we're editing the second name
+                else if (editing == "secondnum") {
+                    // Basically same things as above case, only
+                    // for secondnum
+                    if(secondnum.length < 8){
+                        if(secondnum == "0" && num != "."){
+                            if(num != "0"){
+                                secondnum = num;
+                                setto(secondnum)
+                            }
+                        }
+                        else{
+                            // concatenate the digit
+                            secondnum += num;
+                            // same as above, with secondnum
+                            setto(secondnum)
+                        }
+                    }
+                }
+                // else if we are editing the result of 
+                // a calculation
+                else if(editing == "result"){
+                    // let the edited number be num
+                    firstnum = num
+                    secondnum = ""
+                    // and let the user edit that
+                    editing = "firstnum"
+                    setto(firstnum)
+                }
+            }
+            // Function to backspace a digit
+            // for the number that user is
+            // editing
+            function delnum(){
+                // If we're editing the first number
+                if(editing == "firstnum"){
+                    // The str.slice method allows us to take a 
+                    // portion of the string such that 
+                    // str.slice(a, b) returns the characters
+                    // from a to b-1.
+                    // str.length returns the length of the string
+                    firstnum = firstnum.slice(0, firstnum.length - 1)
+                    setto(firstnum)
+                }
+                else if(editing == "secondnum"){
+                    // same as above, with second num
+                    secondnum = secondnum.slice(0, secondnum.length - 1)
+                    setto(secondnum)
+                }
+                else if(editing == "result"){
+                    // delete the last digit of the result, and 
+                    // set firstnum to it
+                    firstnum = calculate().slice(0, calculate().length - 1)
+                    secondnum = ""
+                    editing = "firstnum"
+                    setto(firstnum)
+                }
+            }
+            function calculate(){
+                // if we are adding...
+                if(operator == "+"){
+                    /* Here, for all 5 operations, we have to check if 
+                    they do not result in error. So we run 2 conditions, the 
+                    first checks if it is equal to itself (and therefore not 
+                    equal to NaN, because
+                    
+                        NaN ≠ NaN => x = x => x ≠ NaN
+                    
+                    ), and the second checks if it is equal to Infinity. We do
+                    a logical AND (using JavaScript's && operator). If it does,
+                    all well and good, but if it doesn't, it returns Error. 
+                    setto will take care of the coloring. 
+                    
+                    parseFloat converts to floating-point, which is simply
+                    decimal.*/
+                    if(
+                        (parseFloat(firstnum) + parseFloat(secondnum)).toString()==
+                        (parseFloat(firstnum) + parseFloat(secondnum)).toString()
+                        &&
+                        (parseFloat(firstnum) + parseFloat(secondnum)).toString()!=Infinity
+                    ){
+                        return (parseFloat(firstnum) + parseFloat(secondnum)).toString()
+                    }
+                    else {
+                        return "Error"
+                    }
+                }
+                else if(operator == "-"){
+                    if(
+                        (parseFloat(firstnum) - parseFloat(secondnum)).toString()==
+                        (parseFloat(firstnum) - parseFloat(secondnum)).toString()
+                        &&
+                        (parseFloat(firstnum) - parseFloat(secondnum)).toString()!=Infinity
+                    ){
+                        return (parseFloat(firstnum) - parseFloat(secondnum)).toString()
+                    }
+                    else {
+                        return "Error"
+                    }
+                }
+                else if(operator == "*"){
+                    if(
+                        (parseFloat(firstnum) * parseFloat(secondnum)).toString()==
+                        (parseFloat(firstnum) * parseFloat(secondnum)).toString()
+                        &&
+                        (parseFloat(firstnum) * parseFloat(secondnum)).toString()!=Infinity
+                    ){
+                        return (parseFloat(firstnum) * parseFloat(secondnum)).toString()
+                    }
+                    else {
+                        return "Error"
+                    }
+                    
+                }
+                else if(operator == "/"){
+                    if(
+                        (parseFloat(firstnum) / parseFloat(secondnum)).toString()==
+                        (parseFloat(firstnum) / parseFloat(secondnum)).toString()
+                        &&
+                        (parseFloat(firstnum) / parseFloat(secondnum)).toString()!=Infinity
+                    ){
+                        return (parseFloat(firstnum) / parseFloat(secondnum)).toString()
+                    }
+                    else {
+                        return "Error"
+                    }
+                }
+                else if(operator == "%"){
+                    if(
+                        (parseFloat(firstnum) % parseFloat(secondnum)).toString()==
+                        (parseFloat(firstnum) % parseFloat(secondnum)).toString()
+                        &&
+                        (parseFloat(firstnum) % parseFloat(secondnum)).toString()!=Infinity
+                    ){
+                        return (parseFloat(firstnum)) % (parseFloat(secondnum)).toString()
+                    }
+                    else {
+                        return "Error"
+                    }
+                }
+                else {
+                    return ""
+                }
+            }
+            function truncate(num){
+                // Returns "Can't Fit" if num exceeds 8 digits.
+                if(num.length > 8){
+                    return "Can't Fit"
+                }
+                else {
+                    return num
+                }
+            }
+            function setop(opname){
+                // Sets operator to opname
+                //
+                // if editing firstnum...
+                if(editing == "firstnum"){
+                    // ...and if firstnum is a blank....
+                    if(firstnum == ""){
+                        // ...set the operator to blank.
+                        operator = "";
+                    }
+                    // but if it is not...
+                    else {
+                        // ... start editing the second number, and
+                        // set the operator to opname.
+                        editing = "secondnum"
+                        operator = opname;
+                    }
+                }
+                // and if we are editing secondnum...
+                else if(editing == "secondnum"){
+                    // ...if secondnum is a blank...
+                    if(secondnum == ""){
+                        // ...set operator to blank.
+                        operator = "";
+                    }
+                    else {
+                        // ...but if it is not, do a calculation, and
+                        // set it to firstnum. Show firstnum, set 
+                        // secondnum to blank, and set operator to 
+                        // opname.
+                        firstnum = truncate(calculate().toString());
+                        secondnum = "";
+                        setto(firstnum)
+                        operator = opname;
+                    }
+                }
+                // ...and if we are editing the result of a 
+                // calculation...
+                else if(editing == "result"){
+                    // ...then set firstnum to the result...
+                    firstnum = calculate()
+                    // ...secondnum to blank...
+                    secondnum = ""
+                    // ...operator to opname...
+                    operator = opname
+                    // ...and let ourselves know
+                    // the user is now editing the second number.
+                    editing = "secondnum"
+                }
+            }
+            function dispresult(){
+                // Displays result.
+                //
+                // If none of the numbers are blanks...
+                if(firstnum != "" && secondnum != ""){
+                    // ...set to the result...
+                    setto(truncate(calculate()))
+                    // ...and let ourselves know we are 
+                    // showing the result.
+                    editing = "result"
+                }
+            }
+            function removeall(){
+                // Clears number.
+                //
+                // If we are currently editing
+                // firstnum...
+                if(editing == "firstnum"){
+                    // ...set it to nil, and 
+                    // show nothing.
+                    firstnum = ""
+                    setto("")
+                }
+                // Same as above
+                else if(editing == "secondnum"){
+                    secondnum = ""
+                    setto("")
+                }
+                else if(editing == "result"){
+                    // simply blank it out.
+                    setto("")
+                }
+            }
+            function switchcase(){
+                // Changes the currently edited number from
+                // positive to negative and vice versa
+                if(editing == "firstnum"){
+                    // 0 - x 
+                    firstnum = (0 - parseFloat(firstnum)).toString()
+                    // if we can make it an integer instead of a 
+                    // decimal
+                    if(parseInt(firstnum) == firstnum.toString()){
+                        // then do so
+                        firstnum = parseInt(firstnum).toString()
+                    }
+                    setto(firstnum)
+                }
+                else if(editing == "secondnum"){
+                    // same as above
+                    secondnum = (0 - parseFloat(secondnum)).toString()
+                    if(parseInt(secondnum) == secondnum.toString()){
+                        secondnum = parseInt(secondnum).toString()
+                    }
+                    setto(secondnum)
+                }
+                else if(editing == "result"){
+                    // also same as above, except with result of 
+                    // old calculations
+                    firstnum = (0 - parseFloat(document.getElementById('screentext').innerHTML)).toString()
+                    secondnum = ""
+                    editing = "firstnum"
+                    if(parseInt(firstnum) == firstnum.toString()){
+                        firstnum = parseInt(firstnum).toString()
+                    }
+                    setto(firstnum)
+                }
+            }
+            function adddec(){
+                // Adds a decimal point, if not already there.
+                if(editing == "firstnum"){
+                    if(!firstnum.includes(".")){
+                        appendnum(".")
+                    }
+                }
+                else if(editing == "secondnum"){
+                    if(!secondnum.includes(".")){
+                        appendnum(".")
+                    }
+                }
+                else if(editing == "result"){
+                    firstnum = "0."
+                    setto(firstnum)
+                }
+            }
+        </script>
+    </body>
+</html>
+<!-- End -->
