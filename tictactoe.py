@@ -4,7 +4,6 @@
 
 # tictactoe.py
 # Basic graphic layout inspired by turtledemo's nim.py
-# Mohammed Rizwan Niju
 
 from turtle import *
 
