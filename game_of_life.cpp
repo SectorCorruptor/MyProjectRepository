@@ -1,6 +1,4 @@
 #include <gtkmm.h>
-#include <iostream>
-#include <math.h>
 
 #define XSPAN 150
 #define YSPAN 150
@@ -15,11 +13,15 @@ class LifeWindow : public Gtk::Window {
         Gtk::Grid LifeDisplay;
         Gtk::ToggleButton LifeCells[XSPAN*YSPAN];
         Gtk::Button LifeRunner;
+        bool isLife = false;
+        sigc::connection LifeConnection;
+        void LifeDoLoop();
+        bool LifeLoop();
         void LifeExecuter();
         int LifeNeighbours(int);
 };
 
-LifeWindow::LifeWindow() : LifeRunner("Next Step"){
+LifeWindow::LifeWindow() : LifeRunner("Play"){
     set_title("Conway's Game Of Life");
     set_default_size(500, 500);
     
@@ -41,7 +43,7 @@ LifeWindow::LifeWindow() : LifeRunner("Next Step"){
     }
     LifeRunner.set_size_request(1800, 25);
     LifeLand.set_size_request(1800, 1000);
-    LifeRunner.signal_clicked().connect(sigc::mem_fun(*this, &LifeWindow::LifeExecuter));
+    LifeRunner.signal_clicked().connect(sigc::mem_fun(*this, &LifeWindow::LifeDoLoop));
 }
 
 int LifeWindow::LifeNeighbours(int place){
@@ -73,30 +75,44 @@ int LifeWindow::LifeNeighbours(int place){
     return amt;
 }
 
+void LifeWindow::LifeDoLoop(){
+    if(!isLife){
+        LifeConnection = Glib::signal_timeout().connect(sigc::mem_fun(*this, &LifeWindow::LifeLoop), 100);
+        isLife = true;
+    } else {
+        LifeConnection.disconnect();
+        isLife = false;
+    }
+}
+
+bool LifeWindow::LifeLoop(){
+    LifeWindow::LifeExecuter();
+    return true;
+}
+
 void LifeWindow::LifeExecuter(){
-    
-        bool results[XSPAN*YSPAN];
-        for(int i=0;i<XSPAN*YSPAN;i++){
-            if(LifeCells[i].get_active()){
-                if((LifeNeighbours(i)==2)||(LifeNeighbours(i)==3)){
-                    results[i] = true;
-                } 
-                else {
-                    results[i] = false;
-                }
+    bool results[XSPAN*YSPAN];
+    for(int i=0;i<XSPAN*YSPAN;i++){
+        if(LifeCells[i].get_active()){
+            if((LifeNeighbours(i)==2)||(LifeNeighbours(i)==3)){
+                results[i] = true;
             } 
             else {
-                if(LifeNeighbours(i)==3){
-                    results[i] = true;
-                } 
-                else {
-                    results[i] = false;
-                }
+                results[i] = false;
+            }
+        } 
+        else {
+            if(LifeNeighbours(i)==3){
+                results[i] = true;
+            } 
+            else {
+                results[i] = false;
             }
         }
-        for(int j=0;j<XSPAN*YSPAN;j++){
-            LifeCells[j].set_active(results[j]);
-        }
+    }
+    for(int j=0;j<XSPAN*YSPAN;j++){
+        LifeCells[j].set_active(results[j]);
+    }
     
 }
 
