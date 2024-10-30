@@ -39,8 +39,8 @@ LifeWindow::LifeWindow() : LifeRunner("Play"){
     LifeDisplayRoot.attach(LifeDisplayMetaRoot, 0, 0);
     LifeDisplayRoot.attach(LifeLand, 0, 1);
 
-    LifeDisplayMetaRoot.attach(LifeRunner, 0, 0);
-    LifeDisplayMetaRoot.attach(LifeSpeed, 1, 0);
+    LifeDisplayMetaRoot.attach(LifeRunner, 1, 0);
+    LifeDisplayMetaRoot.attach(LifeSpeed, 0, 0);
 
     
     LifeLand.set_child(LifeDisplay);
@@ -95,9 +95,11 @@ int LifeWindow::LifeNeighbours(int place){
 
 void LifeWindow::LifeDoLoop(){
     if(!isLife){
+        LifeWindow::LifeRunner.set_label("Playing");
         LifeConnection = Glib::signal_timeout().connect(sigc::mem_fun(*this, &LifeWindow::LifeLoop), 1000/LifeWindow::LifeFPS);
         isLife = true;
     } else {
+        LifeWindow::LifeRunner.set_label("Play");
         LifeConnection.disconnect();
         isLife = false;
     }
