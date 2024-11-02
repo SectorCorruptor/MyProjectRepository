@@ -15,6 +15,7 @@ class LifeWindow : public Gtk::Window {
         Gtk::Grid LifeDisplay;
         Gtk::ToggleButton LifeCells[XSPAN*YSPAN];
         Gtk::Button LifeRunner;
+        Gtk::Button LifeReset;
         Gtk::SpinButton LifeSpeed;
         bool isLife = false;
         int LifeFPS = 10;
@@ -24,6 +25,7 @@ class LifeWindow : public Gtk::Window {
         void LifeExecuter();
         int LifeNeighbours(int);
         void LifeSpeedUpdate();
+        void LifeClear();
 };
 
 LifeWindow::LifeWindow() : LifeRunner("Play"){
@@ -38,12 +40,18 @@ LifeWindow::LifeWindow() : LifeRunner("Play"){
 
     LifeDisplayRoot.attach(LifeDisplayMetaRoot, 0, 0);
     LifeDisplayRoot.attach(LifeLand, 0, 1);
+    LifeDisplayRoot.set_expand(true);
 
+    LifeDisplayMetaRoot.attach(LifeReset, 2, 0);
     LifeDisplayMetaRoot.attach(LifeRunner, 1, 0);
     LifeDisplayMetaRoot.attach(LifeSpeed, 0, 0);
+    LifeDisplayMetaRoot.set_expand(true);
+    LifeRunner.set_expand(true);
+    LifeReset.set_expand(true);
 
-    
     LifeLand.set_child(LifeDisplay);
+
+    LifeReset.set_label("Clear");
 
     LifeDisplay.set_margin(0);
     LifeDisplay.set_halign(Gtk::Align::CENTER);
@@ -54,14 +62,22 @@ LifeWindow::LifeWindow() : LifeRunner("Play"){
         xpos++;
         if(xpos==XSPAN){ypos++;xpos=0;}
     }
-    LifeRunner.set_size_request(1745, 25);
+    LifeRunner.set_size_request(873, 25);
+    LifeReset.set_size_request(872, 25);
     LifeLand.set_size_request(1850, 975);
     LifeSpeed.signal_value_changed().connect(sigc::mem_fun(*this, &LifeWindow::LifeSpeedUpdate));
     LifeRunner.signal_clicked().connect(sigc::mem_fun(*this, &LifeWindow::LifeDoLoop));
+    LifeReset.signal_clicked().connect(sigc::mem_fun(*this, &LifeWindow::LifeClear));
 }
 
 void LifeWindow::LifeSpeedUpdate(){
     LifeWindow::LifeFPS = LifeWindow::LifeSpeed.get_value();
+}
+
+void LifeWindow::LifeClear(){
+    for(int i=0;i<XSPAN*YSPAN;i++){
+        LifeCells[i].set_active(false);
+    }
 }
 
 int LifeWindow::LifeNeighbours(int place){
