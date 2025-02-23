@@ -343,7 +343,12 @@
             function truncate(num){
                 // Returns "Can't Fit" if num exceeds 8 digits.
                 if(num.length > 8){
-                    return "Can't Fit"
+                    if (parseFloat(num) != parseInt(num)){
+                        return Number(num).toFixed(7)
+                    }
+                    else {
+                        return "Can't Fit"
+                    }
                 }
                 else {
                     return num
